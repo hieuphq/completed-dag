@@ -8,5 +8,13 @@ func main() {
 	ns := GenerateNodes(100)
 	nwes := Nodes(ns).GenerateEdges()
 
-	pp.Println(nwes)
+	db, err := NewDB("./temp.leveldb")
+	if err != nil {
+		pp.Println(err)
+		return
+	}
+
+	defer db.Close()
+
+	println(nwes)
 }
