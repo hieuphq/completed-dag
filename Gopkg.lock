@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  branch = "master"
+  digest = "1:4a0c6bb4805508a6287675fac876be2ac1182539ca8a32468d8128882e9d5009"
+  name = "github.com/golang/snappy"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2e65f85255dbc3072edf28d6b5b8efc472979f5a"
+
+[[projects]]
   digest = "1:16dd6b893b78a50564cdde1d9f7ea67224dece11bb0886bd882f1dc3dc1d440d"
   name = "github.com/k0kubun/pp"
   packages = ["."]
@@ -35,6 +43,27 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:9ff9e1808adfc43f788f1c1e9fd2660c285b522243da985a4c043ec6f2a2d736"
+  name = "github.com/syndtr/goleveldb"
+  packages = [
+    "leveldb",
+    "leveldb/cache",
+    "leveldb/comparer",
+    "leveldb/errors",
+    "leveldb/filter",
+    "leveldb/iterator",
+    "leveldb/journal",
+    "leveldb/memdb",
+    "leveldb/opt",
+    "leveldb/storage",
+    "leveldb/table",
+    "leveldb/util",
+  ]
+  pruneopts = "UT"
+  revision = "f9080354173f192dfc8821931eacf9cfd6819253"
+
+[[projects]]
+  branch = "master"
   digest = "1:7ba061af4131fb44b30448572acd0d6fefbf63a61b97b7ef1dea0be5871c2742"
   name = "golang.org/x/sys"
   packages = ["unix"]
@@ -47,6 +76,7 @@
   input-imports = [
     "github.com/k0kubun/pp",
     "github.com/satori/go.uuid",
+    "github.com/syndtr/goleveldb/leveldb",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
