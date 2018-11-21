@@ -11,8 +11,8 @@ import (
 type ConnectedGraph interface {
 	Reach(vertexID domain.UUID) int
 	ConditionalReach(vertexID domain.UUID, flagCondition bool) int
-	List(vertexID domain.UUID) []domain.Node
-	ConditionalList(vertexID domain.UUID, flagCondition bool) []domain.Node
+	List(vertexID domain.UUID) []domain.Vertex
+	ConditionalList(vertexID domain.UUID, flagCondition bool) []domain.Vertex
 	Insert(vertex domain.Node) error
 }
 
@@ -58,12 +58,33 @@ func (s *simpleImpl) ConditionalReach(vertexID domain.UUID, flagCondition bool) 
 	return rs
 }
 
-func (s *simpleImpl) List(vertexID domain.UUID) []domain.Node {
-	return nil
+func (s *simpleImpl) List(vertexID domain.UUID) []domain.Vertex {
+	rs, err := s.ReachHelper.GetReachList(vertexID)
+	if err != nil {
+		pp.Print(err)
+		return nil
+	}
+
+	return rs
 }
 
-func (s *simpleImpl) ConditionalList(vertexID domain.UUID, flagCondition bool) []domain.Node {
-	return nil
+func (s *simpleImpl) ConditionalList(vertexID domain.UUID, flagCondition bool) []domain.Vertex {
+	condition := helper.NoneFlagCondition
+	if flagCondition {
+		condition = helper.TrueFlagCondition
+	}
+
+	if !flagCondition {
+		condition = helper.FalseFlagCondition
+	}
+
+	rs, err := s.ReachHelper.GetReachListCondition(vertexID, condition)
+	if err != nil {
+		pp.Print(err)
+		return nil
+	}
+
+	return rs
 }
 
 func (s *simpleImpl) Insert(vertex domain.Node) error {

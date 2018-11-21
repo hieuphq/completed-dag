@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/hieuphq/completed-dag/domain"
 	"github.com/hieuphq/completed-dag/generator"
 	"github.com/hieuphq/completed-dag/graph"
@@ -27,15 +29,14 @@ func main() {
 
 	domain.Nodes(ns).Print()
 
-	for idx := range ns {
-		curr := ns[idx]
-		pp.Println(g.ConditionalReach(curr.ID, true))
-	}
-
-	for idx := range ns {
-		curr := ns[idx]
-		pp.Println(g.ConditionalReach(curr.ID, false))
-	}
+	// for idx := range ns {
+	curr := ns[1]
+	rs := g.List(curr.ID)
+	pp.Println("Finished")
+	pp.Println(rs)
+	fmt.Println(domain.Vertices(rs).ToString(0))
+	pp.Println(g.Reach(curr.ID))
+	// }
 
 }
 

@@ -28,6 +28,8 @@ const (
 type ReachHelper interface {
 	GetReach(ID domain.UUID) (int, error)
 	GetReachCondition(ID domain.UUID, condition FlagCondition) (int, error)
+	GetReachList(ID domain.UUID) ([]domain.Vertex, error)
+	GetReachListCondition(ID domain.UUID, condition FlagCondition) ([]domain.Vertex, error)
 }
 
 // NewSimpleReachHelper ...
@@ -237,4 +239,184 @@ func (s *simpleReachImpl) getReachParentsCount(ID domain.UUID, condition FlagCon
 		}
 	}
 	return sum, nil
+}
+
+func (s *simpleReachImpl) GetReachList(ID domain.UUID) ([]domain.Vertex, error) {
+	child, err := s.getReachChildrenList(ID, NoneFlagCondition, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	parent, err := s.getReachParentsList(ID, NoneFlagCondition, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	return domain.Vertices([]domain.Vertex{*combineFinalData(child, parent)}), nil
+}
+
+func combineFinalData(child []domain.Vertex, parent []domain.Vertex) *domain.Vertex {
+	if len(child) <= 0 && len(parent) <= 0 {
+		return nil
+	}
+
+	var currNode *domain.Node
+	var childVertices []domain.Vertex
+	var parentVertices []domain.Vertex
+	if len(child) > 0 {
+		currNode = child[0].Node.Clone()
+		childVertices = child[0].ChildrenVertices
+	}
+
+	if len(parent) > 0 {
+		currNode = parent[0].Node.Clone()
+		parentVertices = parent[0].ParentVertices
+	}
+
+	return &domain.Vertex{
+		Node:             currNode,
+		ChildrenVertices: childVertices,
+		ParentVertices:   parentVertices,
+	}
+
+}
+func (s *simpleReachImpl) GetReachListCondition(ID domain.UUID, condition FlagCondition) ([]domain.Vertex, error) {
+	child, err := s.getReachChildrenList(ID, condition, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	parent, err := s.getReachParentsList(ID, condition, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	return domain.Vertices([]domain.Vertex{*combineFinalData(child, parent)}), nil
+}
+
+func (s *simpleReachImpl) getReachChildrenList(ID domain.UUID, condition FlagCondition, level int) ([]domain.Vertex, error) {
+	nd, err := s.getNode(ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	child := domain.Vertices{}
+	currVertex := domain.Vertex{
+		Node: nd,
+	}
+
+	if len(nd.Children) <= 0 {
+
+		if level == 0 {
+			return []domain.Vertex{}, nil
+		}
+
+		switch condition {
+		case NoneFlagCondition:
+			child = child.Append(currVertex)
+
+		case TrueFlagCondition:
+			if nd.Flag {
+				child = child.Append(currVertex)
+			}
+
+		case FalseFlagCondition:
+			if !nd.Flag {
+				child = child.Append(currVertex)
+			}
+		}
+		return child, nil
+	}
+
+	childVertices := domain.Vertices{}
+	for idx := range nd.Children {
+		cID := nd.Children[idx]
+
+		currChildren, err := s.getReachChildrenList(cID, condition, level+1)
+		if err != nil {
+			return child, err
+		}
+		childVertices = childVertices.Join(domain.Vertices(currChildren))
+	}
+
+	switch condition {
+	case NoneFlagCondition:
+		currVertex.ChildrenVertices = currVertex.ChildrenVertices.Join(childVertices)
+
+	case TrueFlagCondition:
+		if nd.Flag {
+			currVertex.ChildrenVertices = currVertex.ChildrenVertices.Join(childVertices)
+		}
+
+	case FalseFlagCondition:
+		if !nd.Flag {
+			currVertex.ChildrenVertices = currVertex.ChildrenVertices.Join(childVertices)
+		}
+	}
+	return []domain.Vertex{currVertex}, nil
+}
+
+func (s *simpleReachImpl) getReachParentsList(ID domain.UUID, condition FlagCondition, level int) ([]domain.Vertex, error) {
+	nd, err := s.getNode(ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	parent := domain.Vertices{}
+	currVertex := domain.Vertex{
+		Node: nd,
+	}
+
+	if len(nd.Parents) <= 0 {
+
+		if level == 0 {
+			return []domain.Vertex{}, nil
+		}
+
+		switch condition {
+		case NoneFlagCondition:
+			parent = parent.Append(currVertex)
+
+		case TrueFlagCondition:
+			if nd.Flag {
+				parent = parent.Append(currVertex)
+			}
+
+		case FalseFlagCondition:
+			if !nd.Flag {
+				parent = parent.Append(currVertex)
+			}
+		}
+		return parent, nil
+	}
+
+	parentVertices := domain.Vertices{}
+	for idx := range nd.Parents {
+		cID := nd.Parents[idx]
+
+		currParent, err := s.getReachParentsList(cID, condition, level+1)
+		if err != nil {
+			return parent, err
+		}
+		// currItm.ParentVertices = currParent
+		parentVertices = parentVertices.Join(domain.Vertices(currParent))
+	}
+
+	switch condition {
+	case NoneFlagCondition:
+		currVertex.ParentVertices = currVertex.ParentVertices.Join(parentVertices)
+
+	case TrueFlagCondition:
+		if nd.Flag {
+			currVertex.ParentVertices = currVertex.ParentVertices.Join(parentVertices)
+		}
+
+	case FalseFlagCondition:
+		if !nd.Flag {
+			currVertex.ParentVertices = currVertex.ParentVertices.Join(parentVertices)
+		}
+	}
+	return []domain.Vertex{currVertex}, nil
 }
