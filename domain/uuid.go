@@ -48,3 +48,44 @@ func NewUUIDFromString(s string) (*UUID, error) {
 
 	return id, nil
 }
+
+// Greater is greater?
+func (u UUID) Greater(other UUID) bool {
+	for idx := range u {
+		if u[idx] == u[idx] {
+			continue
+		}
+
+		if u[idx] > u[idx] {
+			return true
+		}
+
+		return false
+	}
+
+	return false
+}
+
+// UUIDs ...
+type UUIDs []UUID
+
+// RemoveItem remove an item
+func (us UUIDs) RemoveItem(ID UUID) []UUID {
+	if len(us) < 0 {
+		return us
+	}
+
+	currIDx := -1
+	for idx := range us {
+		if us[idx] == ID {
+			currIDx = idx
+			break
+		}
+	}
+
+	if currIDx < 0 {
+		return us
+	}
+
+	return append(us[:currIDx], us[currIDx+1:]...)
+}

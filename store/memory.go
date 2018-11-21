@@ -63,3 +63,37 @@ func (ds *MemoryStore) Delete(key []byte) error {
 func (ds *MemoryStore) Close() error {
 	return nil
 }
+
+// Transfer data
+func (ds *MemoryStore) Transfer(db DB) error {
+	all, err := ds.All()
+
+	if err != nil {
+		return err
+	}
+
+	if len(all) <= 0 {
+		return nil
+	}
+
+	for key := range all {
+		err = db.Put([]byte(key), all[key])
+		if err != nil {
+			return err
+		}
+
+	}
+
+	return nil
+}
+
+// All get all data
+func (ds *MemoryStore) All() (map[string][]byte, error) {
+	rs := map[string][]byte{}
+
+	for key := range ds.cache {
+		rs[key] = ds.cache[key]
+	}
+
+	return rs, nil
+}

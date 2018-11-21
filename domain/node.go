@@ -74,6 +74,36 @@ func NewNodeFromBytes(b []byte) (*Node, error) {
 	return &dt, nil
 }
 
+// ContainsParentID validate a UUID in parent id list
+func (n *Node) ContainsParentID(ID UUID) bool {
+	if len(n.Parents) <= 0 {
+		return false
+	}
+
+	for idx := range n.Parents {
+		if n.Parents[idx] == ID {
+			return true
+		}
+	}
+
+	return false
+}
+
+// Greater is greater?
+func (n *Node) Greater(other *Node) bool {
+	return n.ID.Greater(other.ID)
+}
+
+// RemoveParent remove a parentID in array
+func (n *Node) RemoveParent(ID UUID) {
+	n.Parents = UUIDs(n.Parents).RemoveItem(ID)
+}
+
+// AddChild add a child into children id list
+func (n *Node) AddChild(ID UUID) {
+	n.Children = append(n.Children, ID)
+}
+
 // Nodes node list
 type Nodes []Node
 

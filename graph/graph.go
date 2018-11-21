@@ -17,16 +17,18 @@ type ConnectedGraph interface {
 }
 
 // NewSimpleConnectedGraph simple implement with db
-func NewSimpleConnectedGraph(db store.DB, reach helper.ReachHelper) ConnectedGraph {
+func NewSimpleConnectedGraph(db store.DB, reach helper.ReachHelper, insert helper.InsertHelper) ConnectedGraph {
 	return &simpleImpl{
-		Repo:        db,
-		ReachHelper: reach,
+		Repo:         db,
+		ReachHelper:  reach,
+		InsertHelper: insert,
 	}
 }
 
 type simpleImpl struct {
-	Repo        store.DB
-	ReachHelper helper.ReachHelper
+	Repo         store.DB
+	ReachHelper  helper.ReachHelper
+	InsertHelper helper.InsertHelper
 }
 
 func (s *simpleImpl) Reach(vertexID domain.UUID) int {
@@ -88,5 +90,5 @@ func (s *simpleImpl) ConditionalList(vertexID domain.UUID, flagCondition bool) [
 }
 
 func (s *simpleImpl) Insert(vertex domain.Node) error {
-	return nil
+	return s.InsertHelper.Insert(&vertex)
 }
