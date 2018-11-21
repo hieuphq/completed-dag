@@ -3,6 +3,7 @@ package domain
 import (
 	"bytes"
 	"encoding/gob"
+	"strings"
 
 	"github.com/k0kubun/pp"
 )
@@ -93,4 +94,43 @@ func (ns Nodes) Print() {
 		pp.Println("Flag: ", curr.Flag)
 		pp.Println()
 	}
+}
+
+// ToString node
+func (n *Node) ToString(level int) string {
+	lvStr := ""
+	for idx := 0; idx < level; idx++ {
+		lvStr = lvStr + "    "
+	}
+	strItm := []string{}
+
+	strItm = append(strItm, lvStr+"ID: "+n.ID.String())
+
+	if len(n.Parents) > 0 {
+		strItm = append(strItm, lvStr+"Parents: ")
+		for jdx := range n.Parents {
+			strItm = append(strItm, lvStr+"  "+n.Parents[jdx].String())
+		}
+	}
+
+	if len(n.Children) > 0 {
+		strItm = append(strItm, lvStr+"Children: ")
+		for jdx := range n.Children {
+			strItm = append(strItm, lvStr+"  "+n.Children[jdx].String())
+		}
+	}
+	// strItm = append(strItm, "Flag: "+string(n.Flag))
+	strItm = append(strItm, lvStr+"")
+
+	return strings.Join(strItm, lvStr+"\n")
+}
+
+// ToString node array
+func (ns Nodes) ToString(level int) string {
+	rsStr := []string{}
+	for idx := range ns {
+		curr := ns[idx]
+		rsStr = append(rsStr, curr.ToString(level))
+	}
+	return strings.Join(rsStr, "\n")
 }
