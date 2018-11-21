@@ -16,7 +16,7 @@ func main() {
 
 	defer db.Close()
 
-	size := 10
+	size := 5
 	ns := gen.Generate(size, size-1)
 	err := saveToDB(ns, db)
 	if err != nil {
@@ -29,7 +29,12 @@ func main() {
 
 	for idx := range ns {
 		curr := ns[idx]
-		pp.Println(g.Reach(curr.ID))
+		pp.Println(g.ConditionalReach(curr.ID, true))
+	}
+
+	for idx := range ns {
+		curr := ns[idx]
+		pp.Println(g.ConditionalReach(curr.ID, false))
 	}
 
 }

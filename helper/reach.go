@@ -149,7 +149,21 @@ func (s *simpleReachImpl) getReachChildrenCount(ID domain.UUID, condition FlagCo
 	}
 
 	if level > 0 {
-		return sum + 1, nil
+
+		switch condition {
+		case NoneFlagCondition:
+			sum = sum + 1
+
+		case TrueFlagCondition:
+			if nd.Flag {
+				sum = sum + 1
+			}
+
+		case FalseFlagCondition:
+			if !nd.Flag {
+				sum = sum + 1
+			}
+		}
 	}
 	return sum, nil
 }
@@ -206,7 +220,21 @@ func (s *simpleReachImpl) getReachParentsCount(ID domain.UUID, condition FlagCon
 	}
 
 	if level > 0 {
-		return sum + 1, nil
+
+		switch condition {
+		case NoneFlagCondition:
+			sum = sum + 1
+
+		case TrueFlagCondition:
+			if nd.Flag {
+				sum = sum + 1
+			}
+
+		case FalseFlagCondition:
+			if !nd.Flag {
+				sum = sum + 1
+			}
+		}
 	}
 	return sum, nil
 }

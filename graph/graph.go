@@ -40,7 +40,22 @@ func (s *simpleImpl) Reach(vertexID domain.UUID) int {
 }
 
 func (s *simpleImpl) ConditionalReach(vertexID domain.UUID, flagCondition bool) int {
-	return 0
+	condition := helper.NoneFlagCondition
+	if flagCondition {
+		condition = helper.TrueFlagCondition
+	}
+
+	if !flagCondition {
+		condition = helper.FalseFlagCondition
+	}
+
+	rs, err := s.ReachHelper.GetReachCondition(vertexID, condition)
+	if err != nil {
+		pp.Print(err)
+		return 0
+	}
+
+	return rs
 }
 
 func (s *simpleImpl) List(vertexID domain.UUID) []domain.Node {
