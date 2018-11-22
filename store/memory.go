@@ -97,3 +97,8 @@ func (ds *MemoryStore) All() (map[string][]byte, error) {
 
 	return rs, nil
 }
+
+// TryToGetData ...
+func (ds *MemoryStore) TryToGetData() (bool, error) {
+	return len(ds.cache) > 0, nil
+}
