@@ -5,7 +5,7 @@ Problem: https://pastebin.com/gevUN7Be
 
 **Dwarves Foundation**  
 Email: team@dwarvesv.com   
-Website: https://dwarves.foudation/  
+Website: https://dwarves.foundation/  
 
 ## Specifications
 * Language: **Golang**  
