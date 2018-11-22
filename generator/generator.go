@@ -29,7 +29,16 @@ func (s *simpleImpl) Generate(sizeVertices int, sizeEgdes int) []domain.Node {
 
 	nEgdes := sizeEgdes
 	for idx := 0; idx < sizeVertices; idx++ {
-		nID := domain.NewUUID()
+		var nID domain.UUID
+		if idx == 0 {
+			tempID, _ := domain.NewUUIDFromString(util.RootID)
+			nID = *tempID
+		} else if idx == sizeVertices-1 {
+			tempID, _ := domain.NewUUIDFromString(util.LastID)
+			nID = *tempID
+		} else {
+			nID = domain.NewUUID()
+		}
 
 		currNode := domain.Node{
 			ID:   nID,
