@@ -14,9 +14,9 @@ Website: https://dwarves.foudation/
 
 
 ## Setup and Run
-- make run
-- install dep (https://github.com/golang/dep)
-- dep ensure
+1.  install dep (https://github.com/golang/dep)
+2.  dep ensure
+3.  make run
 
 
 ## Features
