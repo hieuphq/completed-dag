@@ -12,8 +12,35 @@ type Vertex struct {
 	ParentVertices   Vertices
 }
 
+// Clone a vertices
+func (v *Vertex) Clone() *Vertex {
+	var rs Vertex
+
+	rs.Node = v.Node.Clone()
+
+	for idx := range v.ParentVertices {
+		rs.ParentVertices = append(rs.ParentVertices, *v.ParentVertices[idx].Clone())
+	}
+
+	for idx := range v.ChildrenVertices {
+		rs.ChildrenVertices = append(rs.ChildrenVertices, *v.ChildrenVertices[idx].Clone())
+	}
+
+	return &rs
+}
+
 // Vertices vertex list
 type Vertices []Vertex
+
+// Clone a vertices
+func (a Vertices) Clone() Vertices {
+	var rs []Vertex
+	for idx := range a {
+		rs = append(rs, *a[idx].Clone())
+	}
+
+	return rs
+}
 
 // Join 2 arrays
 func (a Vertices) Join(b Vertices) Vertices {

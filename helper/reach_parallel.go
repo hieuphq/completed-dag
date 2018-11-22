@@ -49,10 +49,18 @@ func (s *parallelReachImpl) putNode(node *domain.Node) error {
 }
 
 func (s *parallelReachImpl) GetReach(ID domain.UUID) (int, error) {
+	return s.getReachWithCondition(ID, NoneFlagCondition)
+}
+
+func (s *parallelReachImpl) GetReachCondition(ID domain.UUID, condition FlagCondition) (int, error) {
+	return s.getReachWithCondition(ID, condition)
+}
+
+func (s *parallelReachImpl) getReachWithCondition(ID domain.UUID, condition FlagCondition) (int, error) {
 	var parentWG sync.WaitGroup
 	childCount := 0
 	parentCount := 0
-	numCPU := runtime.NumCPU() / 2
+	numCPU := runtime.NumCPU()
 	parentWG.Add(2)
 	semaphoreChan := make(chan struct{}, numCPU)
 
@@ -79,7 +87,7 @@ func (s *parallelReachImpl) GetReach(ID domain.UUID) (int, error) {
 
 		wg.Add(1)
 		sem <- struct{}{}
-		s.getReachChildrenCount(ID, NoneFlagCondition, 0, childCount, &wg, sem)
+		s.getReachChildrenCount(ID, condition, 0, childCount, &wg, sem)
 
 		wg.Wait()
 
@@ -112,7 +120,7 @@ func (s *parallelReachImpl) GetReach(ID domain.UUID) (int, error) {
 
 		wg.Add(1)
 		sem <- struct{}{}
-		s.getReachParentsCount(ID, NoneFlagCondition, 0, parentCount, &wg, sem)
+		s.getReachParentsCount(ID, condition, 0, parentCount, &wg, sem)
 
 		wg.Wait()
 
@@ -125,10 +133,6 @@ func (s *parallelReachImpl) GetReach(ID domain.UUID) (int, error) {
 	parentWG.Wait()
 
 	return childCount + parentCount, nil
-}
-
-func (s *parallelReachImpl) GetReachCondition(ID domain.UUID, condition FlagCondition) (int, error) {
-	return 0, nil
 }
 
 func (s *parallelReachImpl) getReachParentsCount(ID domain.UUID, condition FlagCondition, level int, parentCh chan<- int, wg *sync.WaitGroup, sem chan struct{}) {
