@@ -1,55 +1,63 @@
 package main
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/hieuphq/completed-dag/domain"
 	"github.com/hieuphq/completed-dag/generator"
 	"github.com/hieuphq/completed-dag/graph"
 	"github.com/hieuphq/completed-dag/helper"
 	"github.com/hieuphq/completed-dag/store"
+	"github.com/hieuphq/completed-dag/util"
 	"github.com/k0kubun/pp"
 )
 
-func main() {
+func generateData(db store.DB) error {
+	size := 100000
 	gen := generator.NewSimpleGenerator()
-
-	db := store.NewMemory()
-
-	defer db.Close()
-
-	size := 4
 	ns := gen.Generate(size, size-1)
 	err := saveToDB(ns, db)
 	if err != nil {
-		pp.Println(err)
+		return err
 	}
+	fmt.Println(ns[0].ToString(0))
 
-	g := graph.NewSimpleConnectedGraph(db, helper.NewSimpleReachHelper(db), helper.NewSimpleInsertHelper(db))
+	return nil
+}
+func main() {
 
-	domain.Nodes(ns).Print()
+	// defer profile.Start(profile.CPUProfile).Stop()
 
-	// for idx := range ns {
-	// curr := ns[1]
-	// rs := g.List(curr.ID)
-	// pp.Println("Finished")
-	// pp.Println(rs)
-	// fmt.Println(domain.Vertices(rs).ToString(0))
-	// pp.Println(g.Reach(curr.ID))
-	// }
-
-	pp.Println(ns)
-
-	nNode := domain.Node{
-		ID:      domain.NewUUID(),
-		Parents: []domain.UUID{ns[0].ID},
-	}
-	pp.Println(nNode)
-	g.Insert(nNode)
-
-	currAll, err := getFromDB(db)
+	db, err := store.NewDB("./temp.leveldb")
 	if err != nil {
-		pp.Println(err)
+		return
 	}
-	pp.Println(currAll)
+
+	defer db.Close()
+
+	// generateData(db)
+
+	g := graph.NewSimpleConnectedGraph(
+		db,
+		helper.NewParallelReachHelper(db),
+		helper.NewSimpleListHelper(db),
+		helper.NewSimpleInsertHelper(db),
+	)
+
+	// g = graph.NewSimpleConnectedGraph(
+	// 	db,
+	// 	helper.NewSimpleReachHelper(db),
+	// 	helper.NewSimpleListHelper(db),
+	// 	helper.NewSimpleInsertHelper(db),
+	// )
+
+	ID, _ := domain.NewUUIDFromString(util.RootID)
+
+	start := time.Now()
+	rs := g.Reach(*ID)
+	pp.Println(time.Since(start).Seconds())
+	pp.Println(rs)
 }
 
 func getFromDB(db store.DB) ([]domain.Node, error) {

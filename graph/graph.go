@@ -17,10 +17,11 @@ type ConnectedGraph interface {
 }
 
 // NewSimpleConnectedGraph simple implement with db
-func NewSimpleConnectedGraph(db store.DB, reach helper.ReachHelper, insert helper.InsertHelper) ConnectedGraph {
+func NewSimpleConnectedGraph(db store.DB, reach helper.ReachHelper, list helper.ListHelper, insert helper.InsertHelper) ConnectedGraph {
 	return &simpleImpl{
 		Repo:         db,
 		ReachHelper:  reach,
+		ListHelper:   list,
 		InsertHelper: insert,
 	}
 }
@@ -28,6 +29,7 @@ func NewSimpleConnectedGraph(db store.DB, reach helper.ReachHelper, insert helpe
 type simpleImpl struct {
 	Repo         store.DB
 	ReachHelper  helper.ReachHelper
+	ListHelper   helper.ListHelper
 	InsertHelper helper.InsertHelper
 }
 
@@ -61,7 +63,7 @@ func (s *simpleImpl) ConditionalReach(vertexID domain.UUID, flagCondition bool) 
 }
 
 func (s *simpleImpl) List(vertexID domain.UUID) []domain.Vertex {
-	rs, err := s.ReachHelper.GetReachList(vertexID)
+	rs, err := s.ListHelper.GetReachList(vertexID)
 	if err != nil {
 		pp.Print(err)
 		return nil
@@ -80,7 +82,7 @@ func (s *simpleImpl) ConditionalList(vertexID domain.UUID, flagCondition bool) [
 		condition = helper.FalseFlagCondition
 	}
 
-	rs, err := s.ReachHelper.GetReachListCondition(vertexID, condition)
+	rs, err := s.ListHelper.GetReachListCondition(vertexID, condition)
 	if err != nil {
 		pp.Print(err)
 		return nil

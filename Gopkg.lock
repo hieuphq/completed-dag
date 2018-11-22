@@ -34,6 +34,14 @@
   version = "v0.0.4"
 
 [[projects]]
+  digest = "1:cfa0d7741863a0e1d30e0ccdd4b48a96a471cdb47892303de8b92c3713af3e77"
+  name = "github.com/pkg/profile"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5b67d428864e92711fcbd2f8629456121a56d91f"
+  version = "v1.2.1"
+
+[[projects]]
   digest = "1:274f67cb6fed9588ea2521ecdac05a6d62a8c51c074c1fccc6a49a40ba80e925"
   name = "github.com/satori/go.uuid"
   packages = ["."]
@@ -75,6 +83,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/k0kubun/pp",
+    "github.com/pkg/profile",
     "github.com/satori/go.uuid",
     "github.com/syndtr/goleveldb/leveldb",
   ]
