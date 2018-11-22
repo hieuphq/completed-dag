@@ -11,6 +11,7 @@ type DB interface {
 	Delete(key []byte) error
 	Transfer(db DB) error
 	All() (map[string][]byte, error)
+	TryToGetData() (bool, error)
 	Close() error
 }
 
@@ -82,4 +83,15 @@ func (r *levelDBImpl) All() (map[string][]byte, error) {
 	}
 
 	return rs, nil
+}
+
+func (r *levelDBImpl) TryToGetData() (bool, error) {
+	iter := r.DB.NewIterator(nil, nil)
+
+	defer iter.Release()
+	if err := iter.Error(); err != nil {
+		return false, err
+	}
+
+	return iter.Next(), nil
 }

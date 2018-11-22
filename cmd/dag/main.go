@@ -14,6 +14,9 @@ import (
 )
 
 func generateData(db store.DB) error {
+	if existed, err := db.TryToGetData(); err != nil || existed {
+		return nil
+	}
 	size := 100000
 	gen := generator.NewSimpleGenerator()
 	ns := gen.Generate(size, size-1)
