@@ -14,7 +14,10 @@ import (
 )
 
 func generateData(db store.DB) error {
-	size := 100000
+	if existed, err := db.TryToGetData(); err != nil || existed {
+		return nil
+	}
+	size := 5
 	gen := generator.NewSimpleGenerator()
 	ns := gen.Generate(size, size-1)
 	err := saveToDB(ns, db)
@@ -36,12 +39,12 @@ func main() {
 
 	defer db.Close()
 
-	// generateData(db)
+	generateData(db)
 
 	g := graph.NewSimpleConnectedGraph(
 		db,
 		helper.NewParallelReachHelper(db),
-		helper.NewSimpleListHelper(db),
+		helper.NewParallelListHelper(db),
 		helper.NewSimpleInsertHelper(db),
 	)
 
@@ -55,7 +58,7 @@ func main() {
 	ID, _ := domain.NewUUIDFromString(util.RootID)
 
 	start := time.Now()
-	rs := g.Reach(*ID)
+	rs := g.List(*ID)
 	pp.Println(time.Since(start).Seconds())
 	pp.Println(rs)
 }

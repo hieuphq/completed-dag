@@ -222,7 +222,7 @@ func (s *simpleReachImpl) getReachParentsCount(ID domain.UUID, condition FlagCon
 
 func combineFinalData(child []domain.Vertex, parent []domain.Vertex) *domain.Vertex {
 	if len(child) <= 0 && len(parent) <= 0 {
-		return nil
+		return &domain.Vertex{}
 	}
 
 	var currNode *domain.Node
